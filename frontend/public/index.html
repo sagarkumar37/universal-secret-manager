@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Secret Manager</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🔐%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <header id="top" hidden>
+    <a href="#/" class="brand">🔐 Secret Manager</a>
+    <span id="banner" class="banner"></span>
+    <nav>
+      <a href="#/" data-nav="vaults">🗂️ Vaults</a>
+      <a href="#/audit" data-nav="audit" data-role="admin">📜 Audit</a>
+      <a href="#/users" data-nav="users" data-role="admin">👥 Users</a>
+    </nav>
+    <span class="who">
+      <span id="avatar" class="avatar"></span>
+      <span class="email" id="who"></span>
+      <span id="role" class="pill"></span>
+      <button id="logout" class="link">Sign out</button>
+    </span>
+  </header>
+  <div id="toasts"></div>
+  <main id="view"><div class="loading"><div class="spinner"></div></div></main>
+
+  <dialog id="dlg">
+    <form id="dlg-form" method="dialog">
+      <h3 id="dlg-title"></h3>
+      <div id="dlg-body"></div>
+      <p id="dlg-err" class="err" hidden></p>
+      <div class="actions">
+        <button type="button" id="dlg-cancel" class="secondary">Cancel</button>
+        <button type="submit" id="dlg-ok">OK</button>
+      </div>
+    </form>
+  </dialog>
+</body>
+</html>

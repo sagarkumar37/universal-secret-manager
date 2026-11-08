@@ -1,0 +1,70 @@
+name: ${USM_PROJECT:-usm}
+
+# Logging uses the Docker daemon default (see README "Logs" for 60-day retention via journald).
+x-common: &common
+  restart: unless-stopped
+
+services:
+  db:
+    <<: *common
+    image: postgres:16-alpine
+    command: ["postgres", "-c", "config_file=/etc/postgresql/postgresql.conf"]
+    environment:
+      POSTGRES_USER: usm
+      POSTGRES_DB: usm
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_owner_password
+    secrets: [db_owner_password]
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./db/postgresql.conf:/etc/postgresql/postgresql.conf:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U usm -d usm"]
+      interval: 5s
+      retries: 20
+
+  migrate:
+    build: ./init-migration
+    restart: "no"
+    environment:
+      PGHOST: db
+      PGUSER: usm
+      PGDATABASE: usm
+      PGPASSWORD_FILE: /run/secrets/db_owner_password
+      USM_APP_DB_PASSWORD_FILE: /run/secrets/app_db_password
+    secrets: [db_owner_password, app_db_password]
+    depends_on:
+      db: { condition: service_healthy }
+
+  backend:
+    <<: *common
+    build:
+      context: ./backend
+      args: { EXTRA_PACKAGES: "${USM_EXTRA_PACKAGES:-}" }
+    environment:
+      USM_CONFIG: /etc/usm/config.yaml
+      DATABASE_URL_FILE: /run/secrets/database_url
+      USM_SESSION_KEY_FILE: /run/secrets/session_key
+      USM_GOOGLE_CLIENT_SECRET_FILE: /run/secrets/google_client_secret
+    secrets: [database_url, session_key, google_client_secret, vault_credentials]
+    volumes:
+      - ${USM_CONFIG_FILE:-./config/config.yaml}:/etc/usm/config.yaml:ro
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+
+  frontend:
+    <<: *common
+    build: ./frontend
+    ports:
+      - "${USM_BIND:-127.0.0.1}:${USM_PORT:-8080}:8080"
+    depends_on: [backend]
+
+secrets:
+  db_owner_password:    { file: ./secrets/db_owner_password }
+  app_db_password:      { file: ./secrets/app_db_password }
+  database_url:         { file: ./secrets/database_url }
+  session_key:          { file: ./secrets/session_key }
+  google_client_secret: { file: ./secrets/google_client_secret }
+  vault_credentials:    { file: ./secrets/vault_credentials }
+
+volumes:
+  db-data:

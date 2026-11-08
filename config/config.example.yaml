@@ -1,0 +1,37 @@
+instance:
+  name: staging
+  banner: STAGING secrets          # shown in the header so nobody confuses instances
+  base_url: https://secrets.example.com
+
+auth:
+  google_client_id: 1234567890-abc.apps.googleusercontent.com
+  allowed_domains: [example.com]   # Google Workspace domain(s) allowed to sign in
+  initial_admins: [you@example.com]
+  session_hours: 8
+  dev_login: false                 # true only with 'memory' vaults, for local testing
+
+vaults:
+  - id: staging
+    label: Staging (GCP)
+    provider: gcp
+    gcp:
+      project: my-staging-project
+      credentials_file: /run/secrets/vault_credentials
+      bundle_filter: "--"            # only manage secrets named <env>--<group>
+
+  # - id: staging-azure
+  #   label: Staging (Azure)
+  #   provider: azure
+  #   azure: { vault_url: "https://my-vault.vault.azure.net/", bundle_filter: "--" }
+
+  # - id: staging-aws
+  #   label: Staging (AWS)
+  #   provider: aws
+  #   aws: { region: eu-west-1, bundle_filter: "--" }
+
+limits:
+  max_value_bytes: 65536
+
+reveal:
+  role: none        # who may view a secret value: none | viewer | editor | admin (reason required, audited)
+  seconds: 30       # how long a revealed value stays on screen

@@ -1,0 +1,18 @@
+# Optional TLS on the docker host itself (no external reverse proxy):
+#   put the certificate chain in secrets/tls.crt and the key in secrets/tls.key, then
+#   COMPOSE_FILE=docker-compose.yml:docker-compose.tls.yml docker compose up -d
+services:
+  tls:
+    image: nginxinc/nginx-unprivileged:1.27-alpine
+    restart: unless-stopped
+    ports:
+      - "${USM_TLS_BIND:-0.0.0.0}:${USM_TLS_PORT:-443}:8443"
+      - "${USM_TLS_BIND:-0.0.0.0}:${USM_HTTP_PORT:-80}:8081"
+    volumes:
+      - ./frontend/tls.conf:/etc/nginx/conf.d/default.conf:ro
+    secrets: [tls_cert, tls_key]
+    depends_on: [frontend]
+
+secrets:
+  tls_cert: { file: ./secrets/tls.crt }
+  tls_key:  { file: ./secrets/tls.key }

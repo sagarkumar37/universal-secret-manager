@@ -1,0 +1,14 @@
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+python-multipart==0.0.20
+authlib==1.4.0
+httpx==0.28.1
+itsdangerous==2.2.0
+pyyaml==6.0.2
+psycopg[binary]==3.2.3
+psycopg-pool==3.2.4
+google-cloud-secret-manager==2.22.0
+# optional vaults:
+# azure-identity==1.19.0
+# azure-keyvault-secrets==4.9.0
+# boto3==1.35.90

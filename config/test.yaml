@@ -1,0 +1,24 @@
+instance:
+  name: test
+  banner: TEST (in-memory vault)
+  base_url: http://127.0.0.1:18080
+
+auth:
+  allowed_domains: [example.com]
+  initial_admins: [admin@example.com]
+  dev_login: true
+
+reveal:
+  role: admin
+  seconds: 30
+
+vaults:
+  - id: test
+    label: Test vault
+    provider: memory
+    memory:
+      bundle_filter: "--"
+      seed:
+        stg--api: {api-secret__DB_PASSWORD: seed-value-alpha-123, api-secret__TOKEN: seed-value-beta-456}
+        stg--web: {web-secret__KEY: seed-value-gamma-789}
+        prod--api: {api-secret__DB_PASSWORD: seed-value-delta-000}
